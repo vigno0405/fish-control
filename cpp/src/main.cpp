@@ -61,6 +61,12 @@ int main(){
         double theta_tail = inverse_tail(phi_tail);
         double theta_fin  = fin_to_servo(phi_fin);
 
+        // Temporary for empirical calibration :
+        if (mode == "test"){
+            double theta_tail = phi_tail;
+            double theta_fin  = phi_fin;
+        }
+
         tail.setPositionDeg(theta_tail);
         fin.setAngle(theta_fin);
 
