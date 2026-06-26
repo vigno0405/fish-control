@@ -1,19 +1,20 @@
-# AUTHOR : GABRIEL VEIGAS MARQUES
-# MASTER PROJECT : BIOMIMETIC FISH OSCILLATORY GAIT
-
 # 🐟 Fish Robot Controller
+
+**Author:** Gabriel Veigas Marques
+**Master Project:** Biomimetic Fish Oscillatory Gait
 
 This repository contains two pieces:
 
-1. **C++ Core** (`fish_control`):  
-   - Reads `cfg.yaml`, drives Dynamixel tail & RC-servo fin, logs data.  
-2. **Python GUI** (`fish_control_client.py`):  
+1. **C++ Core** (`fish_control`):
+   - Reads `cfg.yaml`, drives Dynamixel tail & RC-servo fin, logs data.
+2. **Python GUI** (`fish_control_client.py`):
    - Remote dashboard over SSH to edit `cfg.yaml` and toggle logging.
 
 ---
 
 ## 📁 Repository Layout
 
+```
 fish-control/
 ├── cfg.yaml                  # Main config for both core & GUI
 ├── cpp/                      # C++ core source
@@ -25,8 +26,9 @@ fish-control/
 │   └── ui.py                 # (optional alternative GUI)
 ├── logs/                     # CSV logs written by C++ core
 └── systemd/
-├── fish.service
-└── fish-gui.service
+    ├── fish.service
+    └── fish-gui.service
+```
 
 ---
 
@@ -65,13 +67,15 @@ cd ~/projects/fish-control/cpp/build
 cmake -DCMAKE_INSTALL_PREFIX=/usr/local ..
 make -j4
 sudo make install
+```
 
-This installs the fish_control binary into /usr/local/bin/.
+This installs the `fish_control` binary into `/usr/local/bin/`.
 
-⸻
+---
 
-🐍 Set Up Python GUI
+## 🐍 Set Up Python GUI
 
+```bash
 # Create & activate your venv
 cd ~/projects/fish-control
 python3 -m venv venv-fish
@@ -81,37 +85,42 @@ source venv-fish/bin/activate
 pip install paramiko pyyaml
 # Ensure tkinter is available
 sudo apt install python3-tk
+```
 
 To run manually:
 
+```bash
 source venv-fish/bin/activate
 python fish_control_client.py
+```
 
+---
 
-
-⸻
-
-🛠️ Systemd Services
+## 🛠️ Systemd Services
 
 Copy unit files and enable at boot:
 
+```bash
 sudo cp systemd/fish.service /etc/systemd/system/
 sudo cp systemd/fish-gui.service /etc/systemd/system/
 
 sudo systemctl daemon-reload
 sudo systemctl enable fish.service fish-gui.service
 sudo systemctl start  fish.service fish-gui.service
+```
 
-	•	fish.service runs the C++ core on boot.
-	•	fish-gui.service runs the Python dashboard.
+- `fish.service` runs the C++ core on boot.
+- `fish-gui.service` runs the Python dashboard.
 
-⸻
+---
 
-🔧 Configuration (cfg.yaml)
+## 🔧 Configuration (`cfg.yaml`)
 
-Located at /home/fish_pizero/projects/fish-control/cfg.yaml.
+Located at `/home/fish_pizero/projects/fish-control/cfg.yaml`.
+
 Fields:
 
+```yaml
 mode: "symmetric_sin"         # "standby", "test", or "symmetric_sin"
 amplitude_tail: 20.0
 amplitude_fin:  20.0
@@ -120,57 +129,66 @@ phase:          0.0
 phi_tail:       0.0          # only in "test" mode
 phi_fin:        0.0          # only in "test" mode
 logging:        false        # true to start logging
+```
 
+---
 
+## 🚀 Running & Using
 
-⸻
+0. Should start running the `fish.service` on Pi boot.
 
-🚀 Running & Using
-  0. Should start running the fish.service on Pi boot
+1. Start pigpio:
 
-	1.	Start pigpio:
+   ```bash
+   sudo systemctl enable pigpiod
+   sudo systemctl start  pigpiod
+   ```
 
-sudo systemctl enable pigpiod
-sudo systemctl start  pigpiod
+2. Launch services:
 
+   ```bash
+   sudo systemctl start fish.service
+   sudo systemctl start fish-gui.service
+   ```
 
-	2.	Launch services:
+3. Open GUI (locally or via SSH-X):
 
-sudo systemctl start fish.service
-sudo systemctl start fish-gui.service
+   ```bash
+   source ~/projects/fish-control/venv-fish/bin/activate
+   python fish_control_client.py
+   ```
 
+4. In the GUI:
+   - Select **Host** → **Connect**.
+   - **Load** reads the current `cfg.yaml`.
+   - Modify fields and **Save**.
+   - **Start/Stop Logging** toggles log streaming.
 
-	3.	Open GUI (locally or via SSH-X):
+5. Logs appear in `projects/fish-control/logs/log_YYYYMMDD_HHMMSS.csv`.
 
-source ~/projects/fish-control/venv-fish/bin/activate
-python fish_control_client.py
+---
 
+## 🔄 After Code Changes
 
-	4.	In the GUI:
-	•	Select Host → Connect.
-	•	Load reads the current cfg.yaml.
-	•	Modify fields and Save.
-	•	Start/Stop Logging toggles log streaming.
-	5.	Logs appear in projects/fish-control/logs/log_YYYYMMDD_HHMMSS.csv.
+- **C++ changes:**
 
-⸻
+  ```bash
+  cd ~/projects/fish-control/cpp/build
+  cmake ..
+  make -j4
+  sudo make install
+  sudo systemctl restart fish.service
+  ```
 
-🔄 After Code Changes
-	•	C++ changes:
+- **Python GUI changes:**
 
-cd ~/projects/fish-control/cpp/build
-cmake ..
-make -j4
-sudo make install
-sudo systemctl restart fish.service
+  ```bash
+  sudo systemctl restart fish-gui.service
+  # or re-run python fish_control_client.py
+  ```
 
+Below is the `fish-gui.service` code (run on personnal computer):
 
-	•	Python GUI changes:
-
-sudo systemctl restart fish-gui.service
-# or re-run python fish_control_client.py
-
-below the fish-gui.service code (run on personnal computer):
 ```python
 #!/usr/bin/env python3
 import yaml
@@ -350,19 +368,20 @@ if __name__ == "__main__":
     app.mainloop()
 ```
 
-⸻
+---
 
-🐞 Troubleshooting
-	•	Port errors: check /dev/ttyUSB0, permissions (sudo usermod -aG dialout $USER).
-	•	Dynamixel ping fail: ensure U2D2 green LED & proper wiring.
-	•	GUI blank: confirm tkinter in venv:
+## 🐞 Troubleshooting
 
-python -c "import tkinter; tkinter._test()"
+- **Port errors:** check `/dev/ttyUSB0`, permissions (`sudo usermod -aG dialout $USER`).
+- **Dynamixel ping fail:** ensure U2D2 green LED & proper wiring.
+- **GUI blank:** confirm tkinter in venv:
 
+  ```bash
+  python -c "import tkinter; tkinter._test()"
+  ```
 
-	•	Logging not toggling: verify logging: field in cfg.yaml.
+- **Logging not toggling:** verify `logging:` field in `cfg.yaml`.
 
-⸻
+---
 
 Happy fish-driving! 🐟
-
