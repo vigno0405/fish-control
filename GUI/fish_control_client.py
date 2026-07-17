@@ -17,10 +17,11 @@ import numpy as np
 
 # remote user + where the Pi's cfg.yaml
 PI_USER    = "fish_pizero"
-REMOTE_CFG = "/home/fish_pizero/projects/fish-control/cfg.yaml"
+REMOTE_CFG = "/home/fish_pizero/fish-control/cfg.yaml"
 
 # name -> host-address
 HOST_OPTIONS = {
+    "Pi (hotspot)": "172.20.10.13",
     "EPFL":    "128.179.200.41",
     "GabsPhone":   "fishpizero.local",
     "EPFL2":   "128.179.204.90",

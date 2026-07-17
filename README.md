@@ -154,6 +154,21 @@ logging:        false         # true to start logging
 
 ---
 
+## SSH Access
+
+Connect to the Raspberry Pi over SSH:
+
+```bash
+ssh fish_pizero@172.20.10.13
+```
+
+| Field | Value |
+|-------|-------|
+| Username | `fish_pizero` |
+| Password | `fish_pizero` |
+
+---
+
 ## Quick Start
 
 > The `fish.service` starts automatically on Pi boot. The steps below are for a
